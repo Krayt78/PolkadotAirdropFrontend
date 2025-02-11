@@ -20,8 +20,7 @@ A decentralized application (dApp) that allows users to check their eligibility 
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
-cd web3-airdrop-checker
+git clone https://github.com/Krayt78/PolkadotAirdropFrontend.git
 ```
 
 2. Install dependencies:
