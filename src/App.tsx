@@ -5,7 +5,7 @@ import { usePolkadot } from './lib/hooks/usePolkadot';
 
 function App() {
   const { account, connect, signMessage } = useWallet();
-  const { isLoading: isPolkadotLoading, checkEligibility } = usePolkadot();
+  const { isLoading: isPolkadotLoading, checkEligibility, claim } = usePolkadot();
   const [polkadotAddress, setPolkadotAddress] = useState('');
   const [isChecking, setIsChecking] = useState(false);
   const [isEligible, setIsEligible] = useState<boolean | null>(null);
@@ -13,11 +13,11 @@ function App() {
   const [submitted, setSubmitted] = useState(false);
 
   const handleCheck = async () => {
-    if (!polkadotAddress) return;
+    if (!polkadotAddress || !account) return;
     
     setIsChecking(true);
     try {
-      const eligible = await checkEligibility(polkadotAddress);
+      const eligible = await checkEligibility(account);
       setIsEligible(eligible);
     } catch (error) {
       console.error('Error checking eligibility:', error);
@@ -34,12 +34,22 @@ function App() {
     try {
       const result = await signMessage(polkadotAddress);
       if (result) {
-        // Here you would typically send this data to your backend
-        console.log('Signed message:', result);
-        setSubmitted(true);
+        const { signature } = result;
+        console.log('Signed message:', { signature });
+
+        // Send to chain with Claim extrinsic
+        const claimResult = await claim(polkadotAddress, signature);
+        if (claimResult) {
+          // Transaction success
+          console.log('Transaction success:', claimResult);
+          setSubmitted(true);
+        } else {
+          // Transaction failed
+          console.log('Transaction failed');
+        }
       }
     } catch (error) {
-      console.error('Error submitting:', error);
+      console.error('Error submitting claim:', error);
     } finally {
       setIsSubmitting(false);
     }

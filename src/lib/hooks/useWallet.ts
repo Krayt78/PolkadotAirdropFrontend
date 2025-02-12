@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
-import { EIP712_DOMAIN, ADDRESS_TYPE } from '../config';
 
 export function useWallet() {
   const [account, setAccount] = useState<string | null>(null);
@@ -40,19 +39,21 @@ export function useWallet() {
   const signMessage = async (polkadotAddress: string) => {
     if (!provider || !account) return null;
 
-    const signer = await provider.getSigner();
-    const timestamp = Math.floor(Date.now() / 1000);
+    try {
+      const signer = await provider.getSigner();
+      
+      // Convert the polkadot address to hex format
+      const message = polkadotAddress;
+      
+      // Use personal_sign to match the pallet's signature verification
+      const signature = await signer.signMessage(message);
+      console.log('Signature:', signature);
 
-    const signature = await signer.signTypedData(
-      EIP712_DOMAIN,
-      ADDRESS_TYPE,
-      {
-        address: polkadotAddress,
-        timestamp,
-      }
-    );
-
-    return { signature, timestamp };
+      return { signature };
+    } catch (error) {
+      console.error('Error signing message:', error);
+      return null;
+    }
   };
 
   return { account, connect, signMessage };

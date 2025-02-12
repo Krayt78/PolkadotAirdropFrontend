@@ -83,6 +83,86 @@ Make sure you have MetaMask installed and configured for development:
 2. Create or import a wallet
 3. Connect to the appropriate network (Ethereum Mainnet or testnet)
 
+## Testing
+
+### Prerequisites
+- Make sure you have MetaMask installed and configured
+- Ensure your local Substrate node is built and ready to run
+- Node.js and npm installed
+
+### Testing Steps
+
+1. **Start the Local Node**
+   ```bash
+   # Navigate to your substrate node directory
+   cd ../PolkadotAirdropPallet
+   
+   # Run the node in development mode
+   cargo run --release -- --dev
+   ```
+
+2. **Initialize Test Data**
+   ```bash
+   # Navigate to the frontend directory
+   cd ../PolkadotAirdropFrontend
+   
+   # Run the setup script to initialize claims and balances
+   npx tsx src/test/setup_extrinsics.ts
+   ```
+   This will:
+   - Register test claims for predefined Ethereum addresses
+   - Set up initial balances for testing
+   - Configure the necessary blockchain state
+
+3. **Run the Test Suite**
+   ```bash
+   # Run the claim flow test
+   npx tsx src/test/claimFlow.ts
+   ```
+   The test will:
+   - Connect to MetaMask
+   - Check claim eligibility
+   - Record initial balance
+   - Sign and submit the claim
+   - Verify the balance has increased by the claim amount
+
+### Test Options
+
+You can run the test with different options:
+```bash
+# Skip eligibility check
+npx tsx src/test/claimFlow.ts --skip-eligibility
+
+# Use mock signature (doesn't require MetaMask)
+npx tsx src/test/claimFlow.ts --mock-signature
+
+# Dry run (no actual transactions)
+npx tsx src/test/claimFlow.ts --dry-run
+```
+
+### Troubleshooting
+
+If the test fails, check:
+1. Is your local node running?
+2. Did you run the setup script first?
+3. Is MetaMask unlocked and connected to the correct network?
+4. Are you using the correct Ethereum address in MetaMask?
+
+### Expected Output
+
+A successful test will show:
+```
+Testing claim flow...
+Connected to wallet: 0x...
+Eligible for claim amount: 1000
+Initial balance: 0
+Message signed: 0x...
+Transaction included in block: 0x...
+Final balance: 1000
+Success: Balance increased by the correct claim amount!
+Test completed successfully!
+```
+
 ## Contributing
 
 1. Fork the repository
